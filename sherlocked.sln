@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sherlocked", "sherlocked\sherlocked.vcxproj", "{CBBBA2D0-9DD5-44E3-AF6E-844454BB5817}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CBBBA2D0-9DD5-44E3-AF6E-844454BB5817}.Debug|x64.ActiveCfg = Debug|x64
+		{CBBBA2D0-9DD5-44E3-AF6E-844454BB5817}.Debug|x64.Build.0 = Debug|x64
+		{CBBBA2D0-9DD5-44E3-AF6E-844454BB5817}.Debug|x86.ActiveCfg = Debug|Win32
+		{CBBBA2D0-9DD5-44E3-AF6E-844454BB5817}.Debug|x86.Build.0 = Debug|Win32
+		{CBBBA2D0-9DD5-44E3-AF6E-844454BB5817}.Release|x64.ActiveCfg = Release|x64
+		{CBBBA2D0-9DD5-44E3-AF6E-844454BB5817}.Release|x64.Build.0 = Release|x64
+		{CBBBA2D0-9DD5-44E3-AF6E-844454BB5817}.Release|x86.ActiveCfg = Release|Win32
+		{CBBBA2D0-9DD5-44E3-AF6E-844454BB5817}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AA5B7181-98E5-4D1E-97F1-DEA51635B68C}
+	EndGlobalSection
+EndGlobal
