@@ -80,20 +80,14 @@ void logoInit(string way) {
         cout << endl;
 }
 
-boolean fileCheked() {
-    SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
+boolean fileCheked(string fileExtension) {
     string watchedDirectory = "";
         GetModuleFileName(NULL, buffer, sizeof(buffer) / sizeof(buffer[0])); 
-        wcout << "The path to the file that is running:" << endl << buffer << endl << endl;
-
         GetCurrentDirectory(sizeof(buffer), buffer);
         wstring wstringBuffer(&buffer[0]); //convert to wstring
         string dir(wstringBuffer.begin(), wstringBuffer.end()); //and convert to string.
         watchedDirectory = dir;
         directory = dir;
-        wcout << "Directory in which the SHERLOCK is open: " << endl;
-        cout << watchedDirectory << endl;
-
         SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
         cout << "================== Searches for files in the directory in which the program is open ==================" << endl;
         WIN32_FIND_DATAW wfd;
@@ -109,21 +103,37 @@ boolean fileCheked() {
         {
             do
             {
+                string fileExtensionBeingViewed = "";
                 countnerOfFiles++;
                 wstring ws(&wfd.cFileName[0]);
                 string str(ws.begin(), ws.end());
+                int markerOfDot = 0;
+                for (int i = str.length(); i > 0; i--) {
+                    if (str[i] == '.') {
+                        markerOfDot = i;
+                    }
+                }
                 if (countnerOfFiles > 2) {
-                    if (isTheFileEncrypted(str)) {
-                        SetConsoleTextAttribute(hConsole, (WORD)((10 << 4) | 0));
-                        cout << "[+]";
-                        SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+                    for (int i = markerOfDot; i < str.length(); i++) {
+                        string test1 = "";
+                        test1 = str[i];
+                        fileExtensionBeingViewed = fileExtensionBeingViewed + test1;
                     }
-                    else {
-                        SetConsoleTextAttribute(hConsole, (WORD)((12 << 4) | 0));
-                        cout << "[-]";
-                        SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+                }
+                if ((fileExtension == fileExtensionBeingViewed) || (fileExtension == ".")) {
+                    if (countnerOfFiles > 2) {
+                        if (isTheFileEncrypted(str)) {
+                            SetConsoleTextAttribute(hConsole, (WORD)((10 << 4) | 0));
+                            cout << "[+]";
+                            SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+                        }
+                        else {
+                            SetConsoleTextAttribute(hConsole, (WORD)((12 << 4) | 0));
+                            cout << "[-]";
+                            SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+                        }
+                        cout << str << endl;
                     }
-                    cout << str << endl;
                 }
             } while (NULL != FindNextFileW(hFind, &wfd));
 
@@ -159,6 +169,22 @@ bool encript() {
     return 0;
 }
 
+void usedDirectory() {
+    SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
+    string watchedDirectory = "";
+    GetModuleFileName(NULL, buffer, sizeof(buffer) / sizeof(buffer[0]));
+    wcout << "The path to the file that is running:" << endl << buffer << endl << endl;
+
+    GetCurrentDirectory(sizeof(buffer), buffer);
+    wstring wstringBuffer(&buffer[0]); //convert to wstring
+    string dir(wstringBuffer.begin(), wstringBuffer.end()); //and convert to string.
+    watchedDirectory = dir;
+    directory = dir;
+    wcout << "Directory in which the SHERLOCK is open: " << endl;
+    cout << watchedDirectory << endl;
+    SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
+}
+
 void menu() {
     string enteredString = "";
     while (1) {
@@ -179,15 +205,15 @@ void menu() {
             cout << ">                                || Example: 'cd!C'  -  change drive to 'C:'" << endl;
             cout << ">                                || Example: 'cd'  -  show where you are" << endl;
             cout << ">                                || Example: 'cd*C:"<< ((char)92) <<"Users'  -  specify the path manually" << endl;
-            cout << ">> s - search files in directory || Example: 's.txt'  -  search only .txt files and get info about them" << endl;
+            cout << ">> sf - search files in directory|| Example: 's.txt'  -  search only .txt files and get info about them" << endl;
             cout << ">                                || Example: 's'  -  search all files and get info about them" << endl;
             cout << ">> fd - fully destroy            || Example: 'fdtest.txt'  -  fully destroy information in file 'test.txt'" << endl;
-            cout << ">> e - encrypt                   || Example: 'etest.txt'  -  encrypt the file using password" << endl;
+            cout << ">> ef - encrypt file(s)          || Example: 'etest.txt'  -  encrypt the file using password" << endl;
             cout << ">                                || Example: 'e.txt'  -  encrypt all files of extension .txt" << endl;
             cout << ">                                || Example: 'e.'  -  encrypt all files in directory" << endl;
             cout << ">> rp - remember password        || Example: 'rp1a2B_+'  -  keep the password valid for this session " << endl;
             cout << ">> fp - forget  password         || Example: 'fp'  -  forget the entered password" << endl;
-            cout << ">> d - decipher                  || Example: 'dtest.txt'  -  decrypt file using password " << endl;
+            cout << ">> df - decipher file(s)         || Example: 'dtest.txt'  -  decrypt file using password " << endl;
             cout << ">                                || Example: 'd.txt'  -  decrypt all files of extension .txt" << endl;
             cout << ">                                || Example: 'd.'  -  decrypt all files in directory" << endl;
             cout << ">> of - open the file            || Example: 'oftest.txt'  -  open the file with the default program" << endl;
@@ -270,10 +296,13 @@ void menu() {
             }
         }
         ////////////////////////////////////////////////////////////////////////
-        if (twoСommandСharacters == "s") {
+        if (twoСommandСharacters == "sf") {
             if (thirdCharacterOfTheCommand == '.') {
                 string fileExtension = "";
-               
+                for (int i = 2; i < enteredString.length(); i++) {
+                    fileExtension = fileExtension + enteredString[i];
+                }
+                fileCheked(fileExtension);
             }
         }
         
@@ -295,7 +324,8 @@ void menu() {
 int main()
 {
     logoInit(logoWay);  
-    fileCheked();
+    usedDirectory();
+    fileCheked("."); //all files
     menu();
     system("pause");
 }
