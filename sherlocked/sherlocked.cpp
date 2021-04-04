@@ -9,36 +9,56 @@
 #include <string.h>
 #include <filesystem>
 #include <locale.h>
+#include <windows.h>
+#include <stdio.h>
 
 using namespace std;
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //do not touch! init a colored string!
 
 const string logoWay = "../logo.txt";
 const char encryptionToken[8] = {'S','H','E','R','L','O','C','K',};
+const char destroyToken[8] = {'D','E','S','T','R','O','Y','!', };
+const char settingsToken[8] = {'S','E','T','T','I','N','G','S', };
 string directory = "";
+int maxMemoryUsage = 0;
 TCHAR buffer[MAX_PATH];
 
-boolean isTheFileEncrypted(string fileName) {
-    char encryptionIndicator[8];
+int isTheFileEncrypted(string fileName) {
+    char readIndicator[8];
     if ((fileName.find(".") < 100 )&&(fileName.find(".") >= 1 )) {
         string watchedDirectory = directory + ((char)92) + fileName;
         //cout << watchedDirectory << endl;
         ifstream openFile(watchedDirectory);
-        if (!openFile) return false; //if do not open
-        openFile.get(encryptionIndicator, 8);
-        int c = 0;
+        if (!openFile) return -1; //if do not open
+        openFile.get(readIndicator, 8);
+        int e = 0;
+        int d = 0;
+        int s = 0;
         for (int i = 0; i < 8; i++) {
-            if (encryptionIndicator[i] == encryptionToken[i]) c++;
+            if (readIndicator[i] == encryptionToken[i]) e++;
         }
-        if (c == 7) {
-            return true;
+        for (int i = 0; i < 8; i++) {
+            if (readIndicator[i] == destroyToken[i]) d++;
+        }
+        for (int i = 0; i < 8; i++) {
+            if (readIndicator[i] == settingsToken[i]) s++;
+        }
+        //cout << d << ": destroy cpuntner!" << endl;
+        if (e == 7) {
+            return 1;
+        }
+        else if (d == 7) {
+           return 2;
+        }
+        else if (s == 7) {
+            return 3;
         }
         else {
-           return false;
+            return 0;
         }
     }
     else {
-        return false;
+        return -1;
     }
 }
 
@@ -82,16 +102,18 @@ void logoInit(string way) {
 
 boolean fileCheked(string fileExtension) {
     string watchedDirectory = "";
-        GetModuleFileName(NULL, buffer, sizeof(buffer) / sizeof(buffer[0])); 
+       /* GetModuleFileName(NULL, buffer, sizeof(buffer) / sizeof(buffer[0])); 
         GetCurrentDirectory(sizeof(buffer), buffer);
         wstring wstringBuffer(&buffer[0]); //convert to wstring
         string dir(wstringBuffer.begin(), wstringBuffer.end()); //and convert to string.
         watchedDirectory = dir;
-        directory = dir;
+        directory = dir;*/
         SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
-        cout << "================== Searches for files in the directory in which the program is open ==================" << endl;
+        cout << "=============================== Searches for files in the directory =================================" << endl;
         WIN32_FIND_DATAW wfd;
-        watchedDirectory = watchedDirectory + "/*";
+        watchedDirectory = directory;
+        watchedDirectory = watchedDirectory + ((char)92)  + "*";
+        //cout <<watchedDirectory << " :Directory" << endl;
         wstring wstr(watchedDirectory.begin(), watchedDirectory.end());
         LPCWSTR wide_string;
         wide_string = wstr.c_str();
@@ -122,15 +144,30 @@ boolean fileCheked(string fileExtension) {
                 }
                 if ((fileExtension == fileExtensionBeingViewed) || (fileExtension == ".")) {
                     if (countnerOfFiles > 2) {
-                        if (isTheFileEncrypted(str)) {
+                        if (isTheFileEncrypted(str) == 1) {
                             SetConsoleTextAttribute(hConsole, (WORD)((10 << 4) | 0));
                             cout << "[+]";
                             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
                         }
-                        else {
+                        else if (isTheFileEncrypted(str) == 0) {
                             SetConsoleTextAttribute(hConsole, (WORD)((12 << 4) | 0));
                             cout << "[-]";
                             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+                        }
+                        else if (isTheFileEncrypted(str) == 2) {
+                            SetConsoleTextAttribute(hConsole, (WORD)((14 << 4) | 0));
+                            cout << "[D]";
+                            SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+
+                        }
+                        else if (isTheFileEncrypted(str) == 3) {
+                            SetConsoleTextAttribute(hConsole, (WORD)((8 << 4) | 15));
+                            cout << "[S]";
+                            SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+
+                        }
+                        else if (isTheFileEncrypted(str) == -1) {
+                            cout << "   ";
                         }
                         cout << str << endl;
                     }
@@ -146,9 +183,13 @@ boolean fileCheked(string fileExtension) {
         }
         cout << "========= Search completed successfully. Total files found "; 
         SetConsoleTextAttribute(hConsole, (WORD)((15 << 4) | 0));
-        cout << " " << countnerOfFiles << " ";
+        cout << " " << ( countnerOfFiles - 2 ) << " ";
         SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
-        cout << "   || Use 'help' for more information =" << endl;
+        cout << "   || Use ";
+        SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 14)); //--
+        cout << "'help'";
+        SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+        cout << "for more information = " << endl;
         SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
         return 1;
     
@@ -185,6 +226,36 @@ void usedDirectory() {
     SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
 }
 
+void infoAboutMemory(){
+#define DIV 1024
+#define divisor "K"
+#define WIDTH 7
+    MEMORYSTATUS stat;
+    GlobalMemoryStatus(&stat);
+   /* printf("The MemoryStatus structure is %ld bytes long.\n",
+        stat.dwLength);
+    printf("It should be %d.\n", sizeof(stat));*/
+    cout << endl;
+    if (stat.dwLength == sizeof(stat)) {cout << "Initialization of the RAM buffer is successful!" << endl;}
+    else {cout << "RAM buffer initialization failed" << endl;}
+    cout << "The MemoryStatus structure is: " << stat.dwLength << endl;
+   /* printf("%ld percent of memory is in use.\n",
+        stat.dwMemoryLoad);
+    printf("There are %*ld total %sbytes of physical memory.\n",
+        WIDTH, stat.dwTotalPhys / DIV, divisor);
+    printf("There are %*ld free %sbytes of physical memory.\n",
+        WIDTH, stat.dwAvailPhys / DIV, divisor);
+    printf("There are %*ld total %sbytes of paging file.\n",
+        WIDTH, stat.dwTotalPageFile / DIV, divisor);
+    printf("There are %*ld free %sbytes of paging file.\n",
+        WIDTH, stat.dwAvailPageFile / DIV, divisor);
+    printf("There are %*lx total %sbytes of virtual memory.\n",
+        WIDTH, stat.dwTotalVirtual / DIV, divisor);
+    printf("There are %*lx free %sbytes of virtual memory.\n",
+        WIDTH, stat.dwAvailVirtual / DIV, divisor);*/
+    cout << "Maximum file size for operations: " << (WIDTH, stat.dwAvailPhys / DIV) << " kilobyte" << endl;
+}
+
 void menu() {
     string enteredString = "";
     while (1) {
@@ -199,24 +270,27 @@ void menu() {
         if (enteredString == "help" || enteredString == "sos") {
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 14));
             cout << "=============================================== HELP =================================================" << endl;
-            cout << ">> сd - change directory         || Example: 'cdexample'  -  move to 'example' directory from the original" << endl;
-            cout << ">                                || Example: 'cd" << ((char)92) <<"'  -  go to the root directory, to the drive" << endl;
-            cout << ">                                || Example: 'cd.'  -  go one directory back" << endl;
-            cout << ">                                || Example: 'cd!C'  -  change drive to 'C:'" << endl;
-            cout << ">                                || Example: 'cd'  -  show where you are" << endl;
-            cout << ">                                || Example: 'cd*C:"<< ((char)92) <<"Users'  -  specify the path manually" << endl;
-            cout << ">> sf - search files in directory|| Example: 's.txt'  -  search only .txt files and get info about them" << endl;
-            cout << ">                                || Example: 's'  -  search all files and get info about them" << endl;
+            cout << ">> сd - change directory         || Example: 'cdexample'  -  move to 'example' directory from the original" << endl; //
+            cout << ">                                || Example: 'cd" << ((char)92) <<"'  -  go to the root directory, to the drive" << endl; //
+            cout << ">                                || Example: 'cd.'  -  go one directory back" << endl; //
+            cout << ">                                || Example: 'cd!C'  -  change drive to 'C:'" << endl; //
+            cout << ">                                || Example: 'cd'  -  show where you are" << endl; //
+            cout << ">                                || Example: 'cd*C:"<< ((char)92) <<"Users'  -  specify the path manually" << endl; //
+            cout << ">> sf - search files in directory|| Example: 'sf.txt'  -  search only .txt files and get info about them" << endl; //
+            cout << ">                                || Example: 'sf.'  -  search all files and get info about them" << endl; //
             cout << ">> fd - fully destroy            || Example: 'fdtest.txt'  -  fully destroy information in file 'test.txt'" << endl;
+            cout << ">                                || Example: 'fd.txt'  -  destroy all files of extension .txt" << endl;
+            cout << ">                                || Example: 'fd.'  -  destroy all files in directory" << endl;
             cout << ">> ef - encrypt file(s)          || Example: 'etest.txt'  -  encrypt the file using password" << endl;
-            cout << ">                                || Example: 'e.txt'  -  encrypt all files of extension .txt" << endl;
-            cout << ">                                || Example: 'e.'  -  encrypt all files in directory" << endl;
-            cout << ">> rp - remember password        || Example: 'rp1a2B_+'  -  keep the password valid for this session " << endl;
+            cout << ">                                || Example: 'ef.txt'  -  encrypt all files of extension .txt" << endl;
+            cout << ">                                || Example: 'ef.'  -  encrypt all files in directory" << endl;
+            cout << ">> df - decipher file(s)         || Example: 'dftest.txt'  -  decrypt file using password " << endl;
+            cout << ">                                || Example: 'df.txt'  -  decrypt all files of extension .txt" << endl;
+            cout << ">                                || Example: 'df.'  -  decrypt all files in directory" << endl;
+            cout << ">> rp - remember password        || Example: 'rp1a2B_+'  -  keep the '1a2B_+' password valid for this session " << endl;
             cout << ">> fp - forget  password         || Example: 'fp'  -  forget the entered password" << endl;
-            cout << ">> df - decipher file(s)         || Example: 'dtest.txt'  -  decrypt file using password " << endl;
-            cout << ">                                || Example: 'd.txt'  -  decrypt all files of extension .txt" << endl;
-            cout << ">                                || Example: 'd.'  -  decrypt all files in directory" << endl;
             cout << ">> of - open the file            || Example: 'oftest.txt'  -  open the file with the default program" << endl;
+            cout << ">> ex - exit                     || Example: 'ex'  -  close the programm" << endl;
             cout << "============================================= V0.1 Beta ==============================================" << endl;
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
         }
@@ -325,6 +399,7 @@ int main()
 {
     logoInit(logoWay);  
     usedDirectory();
+    infoAboutMemory();
     fileCheked("."); //all files
     menu();
     system("pause");
