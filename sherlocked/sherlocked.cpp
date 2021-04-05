@@ -12,6 +12,28 @@
 #include <windows.h>
 #include <stdio.h>
 
+#include <iostream>
+#include <string>
+
+#include <chrono>
+#include <sys/stat.h>
+#include <time.h>
+#include <stdio.h>
+
+//#include "date.h"
+
+#include <cstring>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#ifndef WIN32
+#include <unistd.h>
+#endif
+
+#ifdef WIN32
+#define stat _stat
+#endif
+
 using namespace std;
 HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //do not touch! init a colored string!
 
@@ -19,9 +41,194 @@ const string logoWay = "../logo.txt";
 const char encryptionToken[8] = {'S','H','E','R','L','O','C','K',};
 const char destroyToken[8] = {'D','E','S','T','R','O','Y','!', };
 const char settingsToken[8] = {'S','E','T','T','I','N','G','S', };
+const int GMT = 3; //(summer Ukraine)
 string directory = "";
 int maxMemoryUsage = 0;
 TCHAR buffer[MAX_PATH];
+
+string UNIXtoDate(long int seconds) {
+
+    // Save the time in Human
+    // readable format
+    string ans = "";
+
+    // Number of days in month
+    // in normal year
+    int daysOfMonth[] = { 31, 28, 31, 30, 31, 30,
+                          31, 31, 30, 31, 30, 31 };
+
+    long int currYear, daysTillNow, extraTime,
+        extraDays, index, date, month, hours,
+        minutes, secondss, flag = 0;
+
+    // Calculate total days unix time T
+    daysTillNow = seconds / (24 * 60 * 60);
+    extraTime = seconds % (24 * 60 * 60);
+    currYear = 1970;
+
+    // Calculating currrent year
+    while (daysTillNow >= 365) {
+        if (currYear % 400 == 0
+            || (currYear % 4 == 0
+                && currYear % 100 != 0)) {
+            daysTillNow -= 366;
+        }
+        else {
+            daysTillNow -= 365;
+        }
+        currYear += 1;
+    }
+
+    // Updating extradays because it
+    // will give days till previous day
+    // and we have include current day
+    extraDays = daysTillNow + 1;
+
+    if (currYear % 400 == 0
+        || (currYear % 4 == 0
+            && currYear % 100 != 0))
+        flag = 1;
+
+    // Calculating MONTH and DATE
+    month = 0, index = 0;
+    if (flag == 1) {
+        while (true) {
+
+            if (index == 1) {
+                if (extraDays - 29 < 0)
+                    break;
+                month += 1;
+                extraDays -= 29;
+            }
+            else {
+                if (extraDays
+                    - daysOfMonth[index]
+                    < 0) {
+                    break;
+                }
+                month += 1;
+                extraDays -= daysOfMonth[index];
+            }
+            index += 1;
+        }
+    }
+    else {
+        while (true) {
+
+            if (extraDays
+                - daysOfMonth[index]
+                < 0) {
+                break;
+            }
+            month += 1;
+            extraDays -= daysOfMonth[index];
+            index += 1;
+        }
+    }
+
+    // Current Month
+    if (extraDays > 0) {
+        month += 1;
+        date = extraDays;
+    }
+    else {
+        if (month == 2 && flag == 1)
+            date = 29;
+        else {
+            date = daysOfMonth[month - 1];
+        }
+    }
+
+    // Calculating HH:MM:YYYY
+    hours = extraTime / 3600;
+    minutes = (extraTime % 3600) / 60;
+    secondss = (extraTime % 3600) % 60;
+
+    ans += to_string(date);
+    ans += " ";
+    switch (month)
+    {
+    case 1:ans += "Jan";break;
+    case 2:ans += "Feb";break;
+    case 3:ans += "Mar";break;
+    case 4:ans += "Apr";break;
+    case 5:ans += "May";break;
+    case 6:ans += "June";break;
+    case 7:ans += "July";break;
+    case 8:ans += "Aug";break;
+    case 9:ans += "Sept";break;
+    case 10:ans += "Oct";break;
+    case 11:ans += "Nov";break;
+    case 12:ans += "Dec";break;
+    }
+    
+    ans += " ";
+    if (hours < 10) {
+        ans += "0" + to_string(hours);
+    } else{
+        ans += to_string(hours);
+    }
+    ans += ":";
+    if (minutes < 10) {
+        ans += "0" + to_string(minutes);
+    }
+    else {
+        ans += to_string(minutes);
+    }
+    ans += ":";
+    if(secondss < 10){
+        ans += "0" + to_string(secondss);
+    }
+    else {
+        ans += to_string(secondss);
+    }
+    ans += " " + to_string(currYear);
+    
+    // Return the time
+    return ans;
+}
+
+int getInfo(string fileName) {
+    
+    string watchedDirectory = directory + ((char)92) + fileName;
+    
+    ifstream in_file;
+    in_file.open(watchedDirectory, ios::binary);
+    if (!in_file.is_open()) {
+        SetConsoleTextAttribute(hConsole, (WORD)((4 << 4) | 15));
+        cout << "File opening or recognition error!";
+        SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+        cout << "\n";
+        return -1;
+    }
+    else {
+        SetConsoleTextAttribute(hConsole, (WORD)((2 << 4) | 15));
+        cout << "The file was successfully recognized and opened!";
+        SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+        cout << "\n";
+    }
+    SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
+    in_file.seekg(0, ios::end);
+    int file_size = in_file.tellg();
+    cout << "Size of the selected file: " << file_size << " " << "bytes" << endl;
+
+    char watchedDirectoryCharType[1024];
+    strcpy(watchedDirectoryCharType, watchedDirectory.c_str());
+    struct stat t_stat;
+    stat(watchedDirectoryCharType, &t_stat);
+    struct tm* timeinfo = localtime(&t_stat.st_ctime); // or gmtime() depending on what you want
+    printf("Сreation date of the selected file: %s", asctime(timeinfo));
+    struct stat result;
+    __time64_t mod_time;
+    if (stat(watchedDirectory.c_str(), &result) == 0)
+    {
+        mod_time = result.st_mtime;
+    }
+    string date = UNIXtoDate(mod_time+(GMT*3600));
+    cout << "The date the file was last modified: " << date << "\n";
+    SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+    return 1;
+}
 
 int isTheFileEncrypted(string fileName) {
     char readIndicator[8];
@@ -259,7 +466,7 @@ void infoAboutMemory(){
 void menu() {
     string enteredString = "";
     while (1) {
-        cin >> enteredString;
+        getline(cin, enteredString);
         string twoСommandСharacters = "";
         twoСommandСharacters = twoСommandСharacters + (1, enteredString[0]) + (1, enteredString[1]);
         char thirdCharacterOfTheCommand = ' ';
@@ -290,7 +497,9 @@ void menu() {
             cout << ">> rp - remember password        || Example: 'rp1a2B_+'  -  keep the '1a2B_+' password valid for this session " << endl;
             cout << ">> fp - forget  password         || Example: 'fp'  -  forget the entered password" << endl;
             cout << ">> of - open the file            || Example: 'oftest.txt'  -  open the file with the default program" << endl;
-            cout << ">> ex - exit                     || Example: 'ex'  -  close the programm" << endl;
+            cout << ">> gi - get info                 || Example: 'gitest.txt'  -  get info about test.txt file" << endl;
+            cout << ">> exit                          || Example: 'exit'  -  close the programm" << endl;
+            cout << ">> df - delete file              || Example: 'dftest.txt'  -  delete file" << endl;
             cout << "============================================= V0.1 Beta ==============================================" << endl;
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
         }
@@ -379,6 +588,14 @@ void menu() {
                 fileCheked(fileExtension);
             }
         }
+        ///////////////////////////////////////////////////////////////////////
+        if (twoСommandСharacters == "gi") {
+            string fileName = "";
+            for (int i = 2; i < enteredString.length(); i++) {
+                fileName = fileName + enteredString[i];
+            }
+            getInfo(fileName);
+        }
         
     }
 //cout << ">> ad -  automatic decipher      || Example 'ad test.txt'  -  decrypt the file with the saved key" << endl;
@@ -394,6 +611,27 @@ void menu() {
                 cout << newNextFolder << endl;*/
     
 }
+
+/*void getSize() {
+    ifstream in_file;
+    in_file.open("E:\\q.txt", ios::binary);
+    if (in_file.is_open()) {
+        cout << "OPEN" << endl;
+    }
+    else {
+        cout << "ERROR OF OPEN FUCKING FILE" << endl;
+    }
+    in_file.seekg(0, ios::end);
+    int file_size = in_file.tellg();
+    cout << "Size of the file is" << " " << file_size << " " << "bytes" << endl;
+
+    struct stat t_stat;
+    stat("E:\\q.txt", &t_stat);
+    struct tm* timeinfo = localtime(&t_stat.st_ctime); // or gmtime() depending on what you want
+    printf("File time and date: %s", asctime(timeinfo));
+
+
+}*/
 
 int main()
 {
