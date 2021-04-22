@@ -45,6 +45,7 @@ const int GMT = 3; //(summer Ukraine)
 string directory = "";
 int maxMemoryUsage = 0;
 TCHAR buffer[MAX_PATH];
+string password = "";
 
 string UNIXtoDate(long int seconds) {
 
@@ -148,18 +149,18 @@ string UNIXtoDate(long int seconds) {
     ans += " ";
     switch (month)
     {
-    case 1:ans += "Jan";break;
-    case 2:ans += "Feb";break;
-    case 3:ans += "Mar";break;
-    case 4:ans += "Apr";break;
-    case 5:ans += "May";break;
-    case 6:ans += "June";break;
-    case 7:ans += "July";break;
-    case 8:ans += "Aug";break;
-    case 9:ans += "Sept";break;
-    case 10:ans += "Oct";break;
-    case 11:ans += "Nov";break;
-    case 12:ans += "Dec";break;
+    case 1: ans += "Jan"; break;
+    case 2: ans += "Feb"; break;
+    case 3: ans += "Mar"; break;
+    case 4: ans += "Apr"; break;
+    case 5: ans += "May"; break;
+    case 6: ans += "June";break;
+    case 7: ans += "July";break;
+    case 8: ans += "Aug"; break;
+    case 9: ans += "Sept";break;
+    case 10:ans += "Oct"; break;
+    case 11:ans += "Nov"; break;
+    case 12:ans += "Dec"; break;
     }
     
     ans += " ";
@@ -188,46 +189,38 @@ string UNIXtoDate(long int seconds) {
     return ans;
 }
 
-int getInfo(string fileName) {
-    
+boolean getInfo(string fileName, string& fileSize, string& dateCreation, string& dateMode) {
     string watchedDirectory = directory + ((char)92) + fileName;
-    
+    bool doesOpen = false;
+
     ifstream in_file;
     in_file.open(watchedDirectory, ios::binary);
     if (!in_file.is_open()) {
-        SetConsoleTextAttribute(hConsole, (WORD)((4 << 4) | 15));
-        cout << "File opening or recognition error!";
-        SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
-        cout << "\n";
-        return -1;
+        doesOpen = false;
+        return doesOpen;
     }
     else {
-        SetConsoleTextAttribute(hConsole, (WORD)((2 << 4) | 15));
-        cout << "The file was successfully recognized and opened!";
-        SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
-        cout << "\n";
+        doesOpen = true;
     }
     SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
     in_file.seekg(0, ios::end);
     int file_size = in_file.tellg();
-    cout << "Size of the selected file: " << file_size << " " << "bytes" << endl;
-
+    fileSize = to_string(file_size);
     char watchedDirectoryCharType[1024];
     strcpy(watchedDirectoryCharType, watchedDirectory.c_str());
     struct stat t_stat;
     stat(watchedDirectoryCharType, &t_stat);
-    struct tm* timeinfo = localtime(&t_stat.st_ctime); // or gmtime() depending on what you want
-    printf("Сreation date of the selected file: %s", asctime(timeinfo));
+    struct tm* timeinfo = localtime(&t_stat.st_ctime); 
+    dateCreation = asctime(timeinfo);
     struct stat result;
     __time64_t mod_time;
     if (stat(watchedDirectory.c_str(), &result) == 0)
     {
         mod_time = result.st_mtime;
     }
-    string date = UNIXtoDate(mod_time+(GMT*3600));
-    cout << "The date the file was last modified: " << date << "\n";
+    dateMode = UNIXtoDate(mod_time+(GMT*3600));
     SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
-    return 1;
+    return doesOpen;
 }
 
 int isTheFileEncrypted(string fileName) {
@@ -327,6 +320,7 @@ boolean fileCheked(string fileExtension) {
         HANDLE const hFind = FindFirstFileW(wide_string, &wfd); //chose the dir
         setlocale(LC_ALL, "");
         int countnerOfFiles = 0;
+        int countnerOfVisibleFiles = 0;
         string test = "";
         if (INVALID_HANDLE_VALUE != hFind)
         {
@@ -355,22 +349,26 @@ boolean fileCheked(string fileExtension) {
                             SetConsoleTextAttribute(hConsole, (WORD)((10 << 4) | 0));
                             cout << "[+]";
                             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+                            countnerOfVisibleFiles++;
                         }
                         else if (isTheFileEncrypted(str) == 0) {
                             SetConsoleTextAttribute(hConsole, (WORD)((12 << 4) | 0));
                             cout << "[-]";
                             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+                            countnerOfVisibleFiles++;
                         }
                         else if (isTheFileEncrypted(str) == 2) {
                             SetConsoleTextAttribute(hConsole, (WORD)((14 << 4) | 0));
                             cout << "[D]";
                             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+                            countnerOfVisibleFiles++;
 
                         }
                         else if (isTheFileEncrypted(str) == 3) {
                             SetConsoleTextAttribute(hConsole, (WORD)((8 << 4) | 15));
                             cout << "[S]";
                             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
+                            countnerOfVisibleFiles++;
 
                         }
                         else if (isTheFileEncrypted(str) == -1) {
@@ -390,13 +388,13 @@ boolean fileCheked(string fileExtension) {
         }
         cout << "========= Search completed successfully. Total files found "; 
         SetConsoleTextAttribute(hConsole, (WORD)((15 << 4) | 0));
-        cout << " " << ( countnerOfFiles - 2 ) << " ";
+        cout << " " << (countnerOfVisibleFiles) << " ";
         SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
         cout << "   || Use ";
         SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 14)); //--
         cout << "'help'";
         SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 9));
-        cout << "for more information = " << endl;
+        cout << " for more information = " << endl;
         SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
         return 1;
     
@@ -474,7 +472,7 @@ void menu() {
 
         /*cout << twoСommandСharacters << endl;
         cout << thirdCharacterOfTheCommand << endl;*/
-        if (enteredString == "help" || enteredString == "sos") {
+        if (enteredString == "help") {
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 14));
             cout << "=============================================== HELP =================================================" << endl;
             cout << ">> сd - change directory         || Example: 'cdexample'  -  move to 'example' directory from the original" << endl; //
@@ -494,12 +492,14 @@ void menu() {
             cout << ">> df - decipher file(s)         || Example: 'dftest.txt'  -  decrypt file using password " << endl;
             cout << ">                                || Example: 'df.txt'  -  decrypt all files of extension .txt" << endl;
             cout << ">                                || Example: 'df.'  -  decrypt all files in directory" << endl;
-            cout << ">> rp - remember password        || Example: 'rp1a2B_+'  -  keep the '1a2B_+' password valid for this session " << endl;
-            cout << ">> fp - forget  password         || Example: 'fp'  -  forget the entered password" << endl;
-            cout << ">> of - open the file            || Example: 'oftest.txt'  -  open the file with the default program" << endl;
-            cout << ">> gi - get info                 || Example: 'gitest.txt'  -  get info about test.txt file" << endl;
-            cout << ">> exit                          || Example: 'exit'  -  close the programm" << endl;
-            cout << ">> df - delete file              || Example: 'dftest.txt'  -  delete file" << endl;
+            cout << ">> rp - remember password        || Example: 'rp1a2B_+'  -  keep the '1a2B_+' password valid for this session " << endl; //
+            cout << ">> fp - forget  password         || Example: 'fp'  -  forget the entered password" << endl; //
+            cout << ">> of - open the file            || Example: 'oftest.txt'  -  open the file with the default program" << endl;//
+            cout << ">> gi - get info                 || Example: 'gitest.txt'  -  get info about test.txt file" << endl; //
+            cout << ">> exit                          || Example: 'exit'  -  close the programm" << endl; //
+            cout << ">> df - delete file              || Example: 'dftest.txt'  -  delete test.txt file" << endl; //
+            cout << ">> fs - free space               || Example: 'fs'  -  free space in directory" << endl;
+            cout << ">> rt - remove traces            || Example: 'rt'  -  remove traces in a directory" << endl;
             cout << "============================================= V0.1 Beta ==============================================" << endl;
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
         }
@@ -594,9 +594,98 @@ void menu() {
             for (int i = 2; i < enteredString.length(); i++) {
                 fileName = fileName + enteredString[i];
             }
-            getInfo(fileName);
+            string fileSize = "";
+            string dateCreation = "";
+            string dateMode = "";
+            bool fileOpenForGetInfo = getInfo(fileName, fileSize, dateCreation, dateMode);
+            if (!fileOpenForGetInfo) {
+                SetConsoleTextAttribute(hConsole, (WORD)((4 << 4) | 15));
+                cout << "File opening or recognition error!";
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+                cout << "\n";
+            }
+            else {
+                SetConsoleTextAttribute(hConsole, (WORD)((2 << 4) | 15));
+                cout << "The file was successfully recognized and opened!";
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+                cout << "\n";
+            }
+            if (fileOpenForGetInfo) {
+                dateCreation = "Date of creation file: " + dateCreation;
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
+                cout << fileSize << " bytes file size \n" << dateCreation << "Date of modification file: " << dateMode << "\n";
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+            }
         }
-        
+        if (enteredString == "exit") {
+            exit(0);
+        }
+        if (twoСommandСharacters == "df") {
+            string fileName = "";
+            for (int i = 2; i < enteredString.length(); i++) {
+                fileName = fileName + enteredString[i];
+            }
+            fileName = directory + char(92) + fileName;
+            char* fileLocationToDelete = new char[fileName.size() + 1];
+            copy(fileName.begin(), fileName.end(), fileLocationToDelete);
+            fileLocationToDelete[fileName.size()] = '\0'; // don't forget the terminating 0
+            if (!remove(fileLocationToDelete)) {
+                SetConsoleTextAttribute(hConsole, (WORD)((2 << 4) | 15));
+                cout << "The selected file has been successfully deleted!";
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+                cout << "\n";
+            }
+            else {
+                SetConsoleTextAttribute(hConsole, (WORD)((4 << 4) | 15));
+                cout << "Failed to delete the selected file!";
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+                cout << "\n";
+            }
+        }
+        if (twoСommandСharacters == "of") {
+            string fileName = "";
+            for (int i = 2; i < enteredString.length(); i++) {
+                fileName = fileName + enteredString[i];
+            }
+            char* fileToOpen = new char[fileName.size() + 1];
+            copy(fileName.begin(), fileName.end(), fileToOpen);
+            fileToOpen[fileName.size()] = '\0'; // don't forget the terminating 0
+            system(fileToOpen);
+        }
+        if (twoСommandСharacters == "rp") {
+            password = "";
+            for (int i = 2; i < enteredString.length(); i++) {
+                password = password + enteredString[i];
+            }
+            if ((enteredString.length() - 2) == password.length()) {
+                SetConsoleTextAttribute(hConsole, (WORD)((2 << 4) | 15));
+                cout << "Your password has been successfully written!";
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+                cout << "\n";
+            }
+            else {
+                SetConsoleTextAttribute(hConsole, (WORD)((4 << 4) | 15));
+                cout << "Password write error !";
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+                cout << "\n";
+            }
+        }
+        if (twoСommandСharacters == "fp") {
+            password = "";
+            if (password.length() == 0) {
+                SetConsoleTextAttribute(hConsole, (WORD)((2 << 4) | 15));
+                cout << "Your password has been successfully forgotten!";
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+                cout << "\n";
+            }
+            else {
+                SetConsoleTextAttribute(hConsole, (WORD)((4 << 4) | 15));
+                cout << "Password forgotten error !";
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+                cout << "\n";
+            }
+        }
+ 
     }
 //cout << ">> ad -  automatic decipher      || Example 'ad test.txt'  -  decrypt the file with the saved key" << endl;
 //cout << ">> ae - automatic encrypt        || Example 'ae test.txt'  -  automatic file encryption with the selected key" << endl;
