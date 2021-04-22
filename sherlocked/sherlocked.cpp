@@ -15,12 +15,13 @@
 #include <iostream>
 #include <string>
 
+#include "Windows.h"
+#include <stdio.h>
+
 #include <chrono>
 #include <sys/stat.h>
 #include <time.h>
 #include <stdio.h>
-
-//#include "date.h"
 
 #include <cstring>
 
@@ -461,6 +462,28 @@ void infoAboutMemory(){
     cout << "Maximum file size for operations: " << (WIDTH, stat.dwAvailPhys / DIV) << " kilobyte" << endl;
 }
 
+int getDiskFreeSpacePercentage()
+{
+    DWORD lpSectorsPerCluster,
+        lpBytesPerSector,
+        lpNumberOfFreeClusters,
+        lpTotalNumberOfClusters;
+
+    if (GetDiskFreeSpace(NULL,
+        &lpSectorsPerCluster,
+        &lpBytesPerSector,
+        &lpNumberOfFreeClusters,
+        &lpTotalNumberOfClusters))
+    {
+        return int(double(lpNumberOfFreeClusters) / double(lpTotalNumberOfClusters) * 100.0);
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
 void menu() {
     string enteredString = "";
     while (1) {
@@ -476,11 +499,11 @@ void menu() {
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 14));
             cout << "=============================================== HELP =================================================" << endl;
             cout << ">> сd - change directory         || Example: 'cdexample'  -  move to 'example' directory from the original" << endl; //
-            cout << ">                                || Example: 'cd" << ((char)92) <<"'  -  go to the root directory, to the drive" << endl; //
+            cout << ">                                || Example: 'cd" << ((char)92) << "'  -  go to the root directory, to the drive" << endl; //
             cout << ">                                || Example: 'cd.'  -  go one directory back" << endl; //
             cout << ">                                || Example: 'cd!C'  -  change drive to 'C:'" << endl; //
             cout << ">                                || Example: 'cd'  -  show where you are" << endl; //
-            cout << ">                                || Example: 'cd*C:"<< ((char)92) <<"Users'  -  specify the path manually" << endl; //
+            cout << ">                                || Example: 'cd*C:" << ((char)92) << "Users'  -  specify the path manually" << endl; //
             cout << ">> sf - search files in directory|| Example: 'sf.txt'  -  search only .txt files and get info about them" << endl; //
             cout << ">                                || Example: 'sf.'  -  search all files and get info about them" << endl; //
             cout << ">> fd - fully destroy            || Example: 'fdtest.txt'  -  fully destroy information in file 'test.txt'" << endl;
@@ -500,12 +523,13 @@ void menu() {
             cout << ">> df - delete file              || Example: 'dftest.txt'  -  delete test.txt file" << endl; //
             cout << ">> fs - free space               || Example: 'fs'  -  free space in directory" << endl;
             cout << ">> rt - remove traces            || Example: 'rt'  -  remove traces in a directory" << endl;
+            cout << ">> settings                      || Example: 'settings'  -  program settings " << endl;
             cout << "============================================= V0.1 Beta ==============================================" << endl;
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
         }
         else if (twoСommandСharacters == "cd") {
             //cout << "here" << (int)thirdCharacterOfTheCommand << "!" << endl;
-            if (thirdCharacterOfTheCommand == ((char)92) ) {
+            if (thirdCharacterOfTheCommand == ((char)92)) {
                 SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
                 cout << "Last directory: " << directory << endl;
                 string newDirectory = "";
@@ -524,7 +548,7 @@ void menu() {
                         markerOfSeparator = i;
                         break;
                     }
-                    
+
                 }
                 if (markerOfSeparator == 0) {
                     cout << "Error! We are already in the root directory " << endl;
@@ -685,42 +709,64 @@ void menu() {
                 cout << "\n";
             }
         }
- 
-    }
-//cout << ">> ad -  automatic decipher      || Example 'ad test.txt'  -  decrypt the file with the saved key" << endl;
-//cout << ">> ae - automatic encrypt        || Example 'ae test.txt'  -  automatic file encryption with the selected key" << endl;
-//cout << ">> ss - save settings            || Example 'ss'  -  create a sherlock settings file in the working directory" << endl;
-// cout << ">> ds - delete settings          || Example 'ss'  -  delete a sherlock settings file in the working directory" << endl;   
+        if (twoСommandСharacters == "fs") {
+            /*LPCWSTR pszDrive = NULL;
+            BOOL test, fResult;
+            __int64 lpFreeBytesAvailable, lpTotalNumberOfBytes, lpTotalNumberOfFreeBytes;
+            DWORD dwSectPerClust, dwBytesPerSect, dwFreeClusters, dwTotalClusters;
+            test = GetDiskFreeSpaceEx(
+                pszDrive,
+                (PULARGE_INTEGER)&lpFreeBytesAvailable,
+                (PULARGE_INTEGER)&lpTotalNumberOfBytes,
+                (PULARGE_INTEGER)&lpTotalNumberOfFreeBytes
+            );
+            printf("\nUsing GetDiskFreeSpaceEx()...\n");
+            printf("The return value: %d, error code: %d\n", test, GetLastError());
+            printf("Total number of free bytes available for user-caller: %ul\n", lpFreeBytesAvailable);
+            printf("Total number of bytes available for user: %ul\n", lpTotalNumberOfBytes);
+            printf("Total number of free bytes on disk: %ul\n", lpTotalNumberOfFreeBytes);
 
-    /*
-    string newNextFolder = "";
-                for (int i = 3; i < enteredString.length(); i++) {
-                    newNextFolder = newNextFolder + enteredString[i];
-                }
-                cout << newNextFolder << endl;*/
-    
+            fResult = GetDiskFreeSpace(pszDrive,
+                &dwSectPerClust,
+                &dwBytesPerSect,
+                &dwFreeClusters,
+                &dwTotalClusters);
+
+            printf("\nUsing GetDiskFreeSpace()...\n");
+            printf("The return value: %d, error code: %d\n", fResult, GetLastError());
+            printf("Sector per cluster = %ul\n", dwSectPerClust);
+            printf("Bytes per sector = %ul\n", dwBytesPerSect);
+            printf("Free cluster = %ul\n", dwFreeClusters);
+            printf("Total cluster = %ul\n", dwTotalClusters);
+            printf("Total free bytes = %ul\n", (dwFreeClusters * dwSectPerClust * dwBytesPerSect));*/
+
+            ULARGE_INTEGER liFreeBytesAvailable;
+            ULARGE_INTEGER liTotalNumberOfBytes;
+            ULARGE_INTEGER liTotalNumberOfFreeBytes;
+
+            ::GetDiskFreeSpaceEx((L"c:\\"),                 // directory name
+                &liFreeBytesAvailable,      // bytes available to caller
+                &liTotalNumberOfBytes,      // bytes on disk
+                &liTotalNumberOfFreeBytes); // free bytes on disk
+
+            const LONGLONG nKBFactor = 1024;             // (2^10 bytes)
+            const LONGLONG nMBFactor = nKBFactor * 1024; // (2^20 bytes)
+            const LONGLONG nGBFactor = nMBFactor * 1024; // (2^30 bytes)
+
+            // get free space in KB.
+            double dKBFreSpace
+                = (double)(LONGLONG)liTotalNumberOfFreeBytes.QuadPart / nKBFactor;
+            // get free space in MB.
+            double dMBFreSpace
+                = (double)(LONGLONG)liTotalNumberOfFreeBytes.QuadPart / nMBFactor;
+            // get free space in GB.
+            double dGBFreSpace
+                = (double)(LONGLONG)liTotalNumberOfFreeBytes.QuadPart / nGBFactor;
+            cout << dGBFreSpace << " free space in Gb \n";
+        }
+
+    }
 }
-
-/*void getSize() {
-    ifstream in_file;
-    in_file.open("E:\\q.txt", ios::binary);
-    if (in_file.is_open()) {
-        cout << "OPEN" << endl;
-    }
-    else {
-        cout << "ERROR OF OPEN FUCKING FILE" << endl;
-    }
-    in_file.seekg(0, ios::end);
-    int file_size = in_file.tellg();
-    cout << "Size of the file is" << " " << file_size << " " << "bytes" << endl;
-
-    struct stat t_stat;
-    stat("E:\\q.txt", &t_stat);
-    struct tm* timeinfo = localtime(&t_stat.st_ctime); // or gmtime() depending on what you want
-    printf("File time and date: %s", asctime(timeinfo));
-
-
-}*/
 
 int main()
 {
