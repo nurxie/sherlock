@@ -521,7 +521,7 @@ void menu() {
             cout << ">> gi - get info                 || Example: 'gitest.txt'  -  get info about test.txt file" << endl; //
             cout << ">> exit                          || Example: 'exit'  -  close the programm" << endl; //
             cout << ">> df - delete file              || Example: 'dftest.txt'  -  delete test.txt file" << endl; //
-            cout << ">> fs - free space               || Example: 'fs'  -  free space in directory" << endl;
+            cout << ">> fs - free space               || Example: 'fs'  -  free space in directory" << endl; //
             cout << ">> rt - remove traces            || Example: 'rt'  -  remove traces in a directory" << endl;
             cout << ">> settings                      || Example: 'settings'  -  program settings " << endl;
             cout << "============================================= V0.1 Beta ==============================================" << endl;
@@ -710,51 +710,27 @@ void menu() {
             }
         }
         if (twoСommandСharacters == "fs") {
-            /*LPCWSTR pszDrive = NULL;
-            BOOL test, fResult;
-            __int64 lpFreeBytesAvailable, lpTotalNumberOfBytes, lpTotalNumberOfFreeBytes;
-            DWORD dwSectPerClust, dwBytesPerSect, dwFreeClusters, dwTotalClusters;
-            test = GetDiskFreeSpaceEx(
-                pszDrive,
-                (PULARGE_INTEGER)&lpFreeBytesAvailable,
-                (PULARGE_INTEGER)&lpTotalNumberOfBytes,
-                (PULARGE_INTEGER)&lpTotalNumberOfFreeBytes
-            );
-            printf("\nUsing GetDiskFreeSpaceEx()...\n");
-            printf("The return value: %d, error code: %d\n", test, GetLastError());
-            printf("Total number of free bytes available for user-caller: %ul\n", lpFreeBytesAvailable);
-            printf("Total number of bytes available for user: %ul\n", lpTotalNumberOfBytes);
-            printf("Total number of free bytes on disk: %ul\n", lpTotalNumberOfFreeBytes);
-
-            fResult = GetDiskFreeSpace(pszDrive,
-                &dwSectPerClust,
-                &dwBytesPerSect,
-                &dwFreeClusters,
-                &dwTotalClusters);
-
-            printf("\nUsing GetDiskFreeSpace()...\n");
-            printf("The return value: %d, error code: %d\n", fResult, GetLastError());
-            printf("Sector per cluster = %ul\n", dwSectPerClust);
-            printf("Bytes per sector = %ul\n", dwBytesPerSect);
-            printf("Free cluster = %ul\n", dwFreeClusters);
-            printf("Total cluster = %ul\n", dwTotalClusters);
-            printf("Total free bytes = %ul\n", (dwFreeClusters * dwSectPerClust * dwBytesPerSect));*/
-
             ULARGE_INTEGER liFreeBytesAvailable;
             ULARGE_INTEGER liTotalNumberOfBytes;
             ULARGE_INTEGER liTotalNumberOfFreeBytes;
-
-            ::GetDiskFreeSpaceEx((L"c:\\"),                 // directory name
+            string watchedDirectory = "";
+            for (int i = 0; i < 3; i++) {
+                watchedDirectory = watchedDirectory + directory[i];
+            }
+            watchedDirectory = watchedDirectory + (char(92));
+            wstring wWatchedDirectory(watchedDirectory.begin(), watchedDirectory.end());
+            const wchar_t* wCharWatchedDirectory = wWatchedDirectory.c_str();
+            ::GetDiskFreeSpaceEx((wCharWatchedDirectory),              
                 &liFreeBytesAvailable,      // bytes available to caller
                 &liTotalNumberOfBytes,      // bytes on disk
                 &liTotalNumberOfFreeBytes); // free bytes on disk
 
-            const LONGLONG nKBFactor = 1024;             // (2^10 bytes)
-            const LONGLONG nMBFactor = nKBFactor * 1024; // (2^20 bytes)
-            const LONGLONG nGBFactor = nMBFactor * 1024; // (2^30 bytes)
+            const LONGLONG nKBFactor = 1024;            
+            const LONGLONG nMBFactor = nKBFactor * 1024;
+            const LONGLONG nGBFactor = nMBFactor * 1024; 
 
             // get free space in KB.
-            double dKBFreSpace
+            long int dKBFreSpace
                 = (double)(LONGLONG)liTotalNumberOfFreeBytes.QuadPart / nKBFactor;
             // get free space in MB.
             double dMBFreSpace
@@ -762,9 +738,23 @@ void menu() {
             // get free space in GB.
             double dGBFreSpace
                 = (double)(LONGLONG)liTotalNumberOfFreeBytes.QuadPart / nGBFactor;
-            cout << dGBFreSpace << " free space in Gb \n";
+            SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
+            cout << "Free disk space '" << watchedDirectory[0] << ":'" << endl;
+            cout << dKBFreSpace << " KB of free space \n" << dMBFreSpace << " MB of free space \n" << dGBFreSpace << " GB of free space \n";
+            SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
         }
-
+        if (twoСommandСharacters == "rt") {
+            string watchedDirectory = "C:";
+            watchedDirectory = watchedDirectory + (char)92 + (char)92 + "Users" + (char)92 + "Pavel Usatiuk" + (char)92 +"Desktop"+ (char)92 +"testT.txt";
+            ofstream openFile(watchedDirectory);
+            char* buffer = new char[5];
+            buffer[0] = 'q';
+            buffer[1] = 'w';
+            buffer[2] = 'e';
+            buffer[3] = 'r';
+            buffer[4] = 't';
+            openFile.write(buffer, 5);
+        }
     }
 }
 
