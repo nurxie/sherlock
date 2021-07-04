@@ -699,7 +699,9 @@ void menu() {
         string twoСommandСharacters = "";
         twoСommandСharacters = twoСommandСharacters + (1, enteredString[0]) + (1, enteredString[1]);
         char thirdCharacterOfTheCommand = ' ';
-        thirdCharacterOfTheCommand = (1, enteredString[2]);
+        char fourthCharacterOfTheCommand = ' ';
+        if(enteredString.length() >= 2) thirdCharacterOfTheCommand = (1, enteredString[2]);
+        if (enteredString.length() >= 3) fourthCharacterOfTheCommand = (1, enteredString[3]);
 
         /*cout << twoСommandСharacters << endl;
         cout << thirdCharacterOfTheCommand << endl;*/
@@ -734,7 +736,7 @@ void menu() {
         }
         else if (twoСommandСharacters == "cd") {
             //cout << "here" << (int)thirdCharacterOfTheCommand << "!" << endl;
-            if (thirdCharacterOfTheCommand == ((char)92)) {
+            if (fourthCharacterOfTheCommand == ((char)92)) {
                 SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
                 cout << "Last directory: " << directory << endl;
                 string newDirectory = "";
