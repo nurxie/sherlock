@@ -703,7 +703,7 @@ void menu() {
 
         /*cout << twoСommandСharacters << endl;
         cout << thirdCharacterOfTheCommand << endl;*/
-        if (enteredString == "help") {
+        if (enteredString == "help" || enteredString == "sos") {
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 14));
             cout << "=============================================== HELP =================================================" << endl;
             cout << ">> сd - change directory         || Example: 'cdexample'  -  move to 'example' directory from the original" << endl; //
@@ -714,9 +714,6 @@ void menu() {
             cout << ">                                || Example: 'cd*C:" << ((char)92) << "Users'  -  specify the path manually" << endl; //
             cout << ">> sf - search files in directory|| Example: 'sf.txt'  -  search only .txt files and get info about them" << endl; //
             cout << ">                                || Example: 'sf.'  -  search all files and get info about them" << endl; //
-            cout << ">> fd - fully destroy            || Example: 'fdtest.txt'  -  fully destroy information in file 'test.txt'" << endl;
-            cout << ">                                || Example: 'fd.txt'  -  destroy all files of extension .txt" << endl;
-            cout << ">                                || Example: 'fd.'  -  destroy all files in directory" << endl;
             cout << ">> ef - encrypt file(s)          || Example: 'etest.txt'  -  encrypt the file using password" << endl;
             cout << ">                                || Example: 'ef.txt'  -  encrypt all files of extension .txt" << endl;
             cout << ">                                || Example: 'ef.'  -  encrypt all files in directory" << endl;
@@ -730,7 +727,7 @@ void menu() {
             cout << ">> exit                          || Example: 'exit'  -  close the programm" << endl; //
             cout << ">> df - delete file              || Example: 'dftest.txt'  -  delete test.txt file" << endl; //
             cout << ">> fs - free space               || Example: 'fs'  -  free space in directory" << endl; //
-            cout << ">> rt - remove traces            || Example: 'rt'  -  remove traces in a directory" << endl;
+            cout << ">> rt - remove  all traces       || Example: 'rt'  -  remove traces in a directory" << endl;
             cout << ">> settings                      || Example: 'settings'  -  program settings " << endl;
             cout << "============================================= V0.1 Beta ==============================================" << endl;
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
@@ -953,7 +950,7 @@ void menu() {
         }
         if (twoСommandСharacters == "rt") {
             string watchedDirectory = "";
-            creatingStreamsOfCacheFiles(directory, 1, 67108864 + 67108864/2);
+            creatingStreamsOfCacheFiles(directory, 1, 67108864);
         }
     }
 }
