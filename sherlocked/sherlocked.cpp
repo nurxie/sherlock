@@ -48,211 +48,8 @@ int maxMemoryUsage = 0;
 TCHAR buffer[MAX_PATH];
 string password = "";
 
-boolean creatingStreamsOfCacheFiles(string watchedDirectory, int streamsQuantity, int fileSize) {
-    ofstream cache0(watchedDirectory + char(92) + "name0");
-    ofstream cache1(watchedDirectory + char(92) + "name1");
-    ofstream cache2(watchedDirectory + char(92) + "name2");
-    ofstream cache3(watchedDirectory + char(92) + "name3");
-    ofstream cache4(watchedDirectory + char(92) + "name4");
-    ofstream cache5(watchedDirectory + char(92) + "name5");
-    ofstream cache6(watchedDirectory + char(92) + "name6");
-    ofstream cache7(watchedDirectory + char(92) + "name7");
-    ofstream cache8(watchedDirectory + char(92) + "name8");
-    ofstream cache9(watchedDirectory + char(92) + "name9");
-    ofstream cache10(watchedDirectory + char(92) + "name10");
-    ofstream cache11(watchedDirectory + char(92) + "name11");
-    ofstream cache12(watchedDirectory + char(92) + "name12");
-    ofstream cache13(watchedDirectory + char(92) + "name13");
-    ofstream cache14(watchedDirectory + char(92) + "name14");
-    ofstream cache15(watchedDirectory + char(92) + "name15");
-    ofstream cache16(watchedDirectory + char(92) + "name16");
-    ofstream cache17(watchedDirectory + char(92) + "name17");
-    ofstream cache18(watchedDirectory + char(92) + "name18");
-    ofstream cache19(watchedDirectory + char(92) + "name19");
-    ofstream cache20(watchedDirectory + char(92) + "name20");
-    ofstream cache21(watchedDirectory + char(92) + "name21");
-    ofstream cache22(watchedDirectory + char(92) + "name22");
-    ofstream cache23(watchedDirectory + char(92) + "name23");
-    ofstream cache24(watchedDirectory + char(92) + "name24");
-    ofstream cache25(watchedDirectory + char(92) + "name25");
-    ofstream cache26(watchedDirectory + char(92) + "name26");
-    ofstream cache27(watchedDirectory + char(92) + "name27");
-    ofstream cache28(watchedDirectory + char(92) + "name28");
-    ofstream cache29(watchedDirectory + char(92) + "name29");
-    ofstream cache30(watchedDirectory + char(92) + "name30");
-    ofstream cache31(watchedDirectory + char(92) + "name31");
-    ofstream cache32(watchedDirectory + char(92) + "name32");
-    ofstream cache33(watchedDirectory + char(92) + "name33");
-    ofstream cache34(watchedDirectory + char(92) + "name34");
-    ofstream cache35(watchedDirectory + char(92) + "name35");
-    ofstream cache36(watchedDirectory + char(92) + "name36");
-    ofstream cache37(watchedDirectory + char(92) + "name37");
-    ofstream cache38(watchedDirectory + char(92) + "name38");
-    ofstream cache39(watchedDirectory + char(92) + "name39");
-    ofstream cache40(watchedDirectory + char(92) + "name40");
-    ofstream cache41(watchedDirectory + char(92) + "name41");
-    ofstream cache42(watchedDirectory + char(92) + "name42");
-    ofstream cache43(watchedDirectory + char(92) + "name43");
-    ofstream cache44(watchedDirectory + char(92) + "name44");
-    ofstream cache45(watchedDirectory + char(92) + "name45");
-    ofstream cache46(watchedDirectory + char(92) + "name46");
-    ofstream cache47(watchedDirectory + char(92) + "name47");
-    ofstream cache48(watchedDirectory + char(92) + "name48");
-    ofstream cache49(watchedDirectory + char(92) + "name49");
-    ofstream cache50(watchedDirectory + char(92) + "name50");
-    ofstream cache51(watchedDirectory + char(92) + "name51");
-    ofstream cache52(watchedDirectory + char(92) + "name52");
-    ofstream cache53(watchedDirectory + char(92) + "name53");
-    ofstream cache54(watchedDirectory + char(92) + "name54");
-    ofstream cache55(watchedDirectory + char(92) + "name55");
-    ofstream cache56(watchedDirectory + char(92) + "name56");
-    ofstream cache57(watchedDirectory + char(92) + "name57");
-    ofstream cache58(watchedDirectory + char(92) + "name58");
-    ofstream cache59(watchedDirectory + char(92) + "name59");
-    ofstream cache60(watchedDirectory + char(92) + "name60");
-    ofstream cache61(watchedDirectory + char(92) + "name61");
-    ofstream cache62(watchedDirectory + char(92) + "name62");
-    ofstream cache63(watchedDirectory + char(92) + "name63");
-    //ofstream cache64(watchedDirectory + char(92) + "name64");
-    char* buffer = new char[fileSize];
-    for (int i = 0; i < fileSize; i++) {
-        buffer[i] = 'I';
-    }
-    cout << "record\n";
-    //for (int i = 0; i < 1048576; i++) {
-        cache0.write(buffer, fileSize);
-        cache1.write(buffer, fileSize);
-        cache2.write(buffer, fileSize);
-        cache3.write(buffer, fileSize);
-        cache4.write(buffer, fileSize);
-        cache5.write(buffer, fileSize);
-        cache6.write(buffer, fileSize);
-        cache7.write(buffer, fileSize);
-        cache8.write(buffer, fileSize);
-        cache9.write(buffer, fileSize);
-        cache10.write(buffer, fileSize);
-        cache11.write(buffer, fileSize);
-        cache12.write(buffer, fileSize);
-        cache13.write(buffer, fileSize);
-        cache14.write(buffer, fileSize);
-        cache15.write(buffer, fileSize);
-        cache16.write(buffer, fileSize);
-        cache17.write(buffer, fileSize);
-        cache18.write(buffer, fileSize);
-        cache19.write(buffer, fileSize);
-        cache20.write(buffer, fileSize);
-        cache21.write(buffer, fileSize);
-        cache22.write(buffer, fileSize);
-        cache23.write(buffer, fileSize);
-        cache24.write(buffer, fileSize);
-        cache25.write(buffer, fileSize);
-        cache26.write(buffer, fileSize);
-        cache27.write(buffer, fileSize);
-        cache28.write(buffer, fileSize);
-        cache29.write(buffer, fileSize);
-        cache30.write(buffer, fileSize);
-        cache31.write(buffer, fileSize);
-        cache32.write(buffer, fileSize);
-        cache33.write(buffer, fileSize);
-        cache34.write(buffer, fileSize);
-        cache35.write(buffer, fileSize);
-        cache36.write(buffer, fileSize);
-        cache37.write(buffer, fileSize);
-        cache38.write(buffer, fileSize);
-        cache39.write(buffer, fileSize);
-        cache40.write(buffer, fileSize);
-        cache41.write(buffer, fileSize);
-        cache42.write(buffer, fileSize);
-        cache43.write(buffer, fileSize);
-        cache44.write(buffer, fileSize);
-        cache45.write(buffer, fileSize);
-        cache46.write(buffer, fileSize);
-        cache47.write(buffer, fileSize);
-        cache48.write(buffer, fileSize);
-        cache49.write(buffer, fileSize);
-        cache50.write(buffer, fileSize);
-        cache51.write(buffer, fileSize);
-        cache52.write(buffer, fileSize);
-        cache53.write(buffer, fileSize);
-        cache54.write(buffer, fileSize);
-        cache55.write(buffer, fileSize);
-        cache56.write(buffer, fileSize);
-        cache57.write(buffer, fileSize);
-        cache58.write(buffer, fileSize);
-        cache59.write(buffer, fileSize);
-        cache60.write(buffer, fileSize);
-        cache61.write(buffer, fileSize);
-        cache62.write(buffer, fileSize);
-        cache63.write(buffer, fileSize);
-        //cache64.write(buffer, fileSize);
-        cout << ".";
-    //}
-    cout << "\n End) \n";
-    cache0.close();
-    cache1.close();
-    cache2.close();
-    cache3.close();
-    cache4.close();
-    cache5.close();
-    cache6.close();
-    cache7.close();
-    cache8.close();
-    cache9.close();
-    cache10.close();
-    cache11.close();
-    cache12.close();
-    cache13.close();
-    cache14.close();
-    cache15.close();
-    cache16.close();
-    cache17.close();
-    cache18.close();
-    cache19.close();
-    cache20.close();
-    cache21.close();
-    cache22.close();
-    cache23.close();
-    cache24.close();
-    cache25.close();
-    cache26.close();
-    cache27.close();
-    cache28.close();
-    cache29.close();
-    cache30.close();
-    cache31.close();
-    cache32.close();
-    cache33.close();
-    cache34.close();
-    cache35.close();
-    cache36.close();
-    cache37.close();
-    cache38.close();
-    cache39.close();
-    cache40.close();
-    cache41.close();
-    cache42.close();
-    cache43.close();
-    cache44.close();
-    cache45.close();
-    cache46.close();
-    cache47.close();
-    cache48.close();
-    cache49.close();
-    cache50.close();
-    cache51.close();
-    cache52.close();
-    cache53.close();
-    cache54.close();
-    cache55.close();
-    cache56.close();
-    cache57.close();
-    cache58.close();
-    cache59.close();
-    cache60.close();
-    cache61.close();
-    cache62.close();
-    cache63.close();
-    //cache64.close();
+boolean createJunkFiles() {
+    system("fsutil file createnew E:\File.txt 600");
     return 0;
 }
 
@@ -723,18 +520,18 @@ void menu() {
             cout << ">                                || Example: 'cd C:" << ((char)92) << "Users'  -  specify the path manually" << endl; // 
             cout << ">> ls - search files in directory|| Example: 'ls .txt'  -  search only .txt files and get info about them" << endl; //
             cout << ">                                || Example: 'ls'  -  search all files and get info about them" << endl; //
-            cout << ">> ef - encrypt file(s)          || Example: 'etest.txt'  -  encrypt the file using password" << endl;
-            cout << ">                                || Example: 'ef.txt'  -  encrypt all files of extension .txt" << endl;
-            cout << ">                                || Example: 'ef.'  -  encrypt all files in directory" << endl;
-            cout << ">> df - decipher file(s)         || Example: 'dftest.txt'  -  decrypt file using password " << endl;
-            cout << ">                                || Example: 'df.txt'  -  decrypt all files of extension .txt" << endl;
-            cout << ">                                || Example: 'df.'  -  decrypt all files in directory" << endl;
-            cout << ">> rp - remember password        || Example: 'rp1a2B_+'  -  keep the '1a2B_+' password valid for this session " << endl; //
+            cout << ">> ef - encrypt file(s)          || Example: 'ef test.txt'  -  encrypt the file using password" << endl;
+            cout << ">                                || Example: 'ef .txt'  -  encrypt all files of extension .txt" << endl;
+            cout << ">                                || Example: 'ef .'  -  encrypt all files in directory" << endl;
+            cout << ">> df - decipher file(s)         || Example: 'df test.txt'  -  decrypt file using password " << endl;
+            cout << ">                                || Example: 'df .txt'  -  decrypt all files of extension .txt" << endl;
+            cout << ">                                || Example: 'df .'  -  decrypt all files in directory" << endl;
+            cout << ">> rp - remember password        || Example: 'rp 1a2B_+'  -  keep the '1a2B_+' password valid for this session " << endl; //
             cout << ">> fp - forget  password         || Example: 'fp'  -  forget the entered password" << endl; //
-            cout << ">> of - open the file            || Example: 'oftest.txt'  -  open the file with the default program" << endl;//
-            cout << ">> gi - get info                 || Example: 'gitest.txt'  -  get info about test.txt file" << endl; //
+            cout << ">> of - open the file            || Example: 'of test.txt'  -  open the file with the default program" << endl;//
+            cout << ">> gi - get info                 || Example: 'gi test.txt'  -  get info about test.txt file" << endl; //
             cout << ">> exit                          || Example: 'exit'  -  close the programm" << endl; //
-            cout << ">> df - delete file              || Example: 'dftest.txt'  -  delete test.txt file" << endl; //
+            cout << ">> df - delete file              || Example: 'df test.txt'  -  delete test.txt file" << endl; //
             cout << ">> fs - free space               || Example: 'fs'  -  free space in directory" << endl; //
             cout << ">> rt - remove  all traces       || Example: 'rt'  -  remove traces in a directory" << endl;
             cout << ">> settings                      || Example: 'settings'  -  program settings " << endl;
@@ -832,11 +629,11 @@ void menu() {
             }
             else { uknowCommand(); }
         }
-        else { uknowCommand(); }
+        //else { uknowCommand(); }
         ///////////////////////////////////////////////////////////////////////
-        if (twoСommandСharacters == "gi") {
+        if (enteredString[0] == 'g' && enteredString[1] == 'i') {
             string fileName = "";
-            for (int i = 2; i < enteredString.length(); i++) {
+            for (int i = 3; i < enteredString.length(); i++) {
                 fileName = fileName + enteredString[i];
             }
             string fileSize = "";
@@ -865,9 +662,9 @@ void menu() {
         if (enteredString == "exit") {
             exit(0);
         }
-        if (twoСommandСharacters == "df") {
+        if (enteredString[0] == 'd' && enteredString[1] == 'f') {
             string fileName = "";
-            for (int i = 2; i < enteredString.length(); i++) {
+            for (int i = 3; i < enteredString.length(); i++) {
                 fileName = fileName + enteredString[i];
             }
             fileName = directory + char(92) + fileName;
@@ -887,9 +684,9 @@ void menu() {
                 cout << "\n";
             }
         }
-        if (twoСommandСharacters == "of") {
+        if (enteredString[0] == 'o' && enteredString[1] == 'f') {
             string fileName = "";
-            for (int i = 2; i < enteredString.length(); i++) {
+            for (int i = 3; i < enteredString.length(); i++) {
                 fileName = fileName + enteredString[i];
             }
             char* fileToOpen = new char[fileName.size() + 1];
@@ -897,12 +694,12 @@ void menu() {
             fileToOpen[fileName.size()] = '\0'; // don't forget the terminating 0
             system(fileToOpen);
         }
-        if (twoСommandСharacters == "rp") {
+        if (enteredString[0] == 'r' && enteredString[1] == 'p') {
             password = "";
-            for (int i = 2; i < enteredString.length(); i++) {
+            for (int i = 3; i < enteredString.length(); i++) {
                 password = password + enteredString[i];
             }
-            if ((enteredString.length() - 2) == password.length()) {
+            if ((enteredString.length() - 3) == password.length()) {
                 SetConsoleTextAttribute(hConsole, (WORD)((2 << 4) | 15));
                 cout << "Your password has been successfully written!";
                 SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
@@ -915,7 +712,7 @@ void menu() {
                 cout << "\n";
             }
         }
-        if (twoСommandСharacters == "fp") {
+        if (enteredString[0] == 'f' && enteredString[1] == 'p') {
             password = "";
             if (password.length() == 0) {
                 SetConsoleTextAttribute(hConsole, (WORD)((2 << 4) | 15));
@@ -930,7 +727,7 @@ void menu() {
                 cout << "\n";
             }
         }
-        if (twoСommandСharacters == "fs") {
+        if (enteredString[0] == 'f' && enteredString[1] == 's') {
             ULARGE_INTEGER liFreeBytesAvailable;
             ULARGE_INTEGER liTotalNumberOfBytes;
             ULARGE_INTEGER liTotalNumberOfFreeBytes;
@@ -964,9 +761,9 @@ void menu() {
             cout << dKBFreSpace << " KB of free space \n" << dMBFreSpace << " MB of free space \n" << dGBFreSpace << " GB of free space \n";
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
         }
-        if (twoСommandСharacters == "rt") {
+        if (enteredString[0] == 'r' && enteredString[1] == 't') {
             string watchedDirectory = "";
-            creatingStreamsOfCacheFiles(directory, 1, 67108864);
+            createJunkFiles();
         }
     }
 }
