@@ -691,6 +691,13 @@ int getDiskFreeSpacePercentage()
     }
 }
 
+void uknowCommand() {
+    SetConsoleTextAttribute(hConsole, (WORD)((4 << 4) | 15));
+    cout << "Uknow command!";
+    SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+    cout << endl;
+}
+
 
 void menu() {
     string enteredString = "";
@@ -701,21 +708,21 @@ void menu() {
         char thirdCharacterOfTheCommand = ' ';
         char fourthCharacterOfTheCommand = ' ';
         if(enteredString.length() >= 2) thirdCharacterOfTheCommand = (1, enteredString[2]);
-        if (enteredString.length() >= 3) fourthCharacterOfTheCommand = (1, enteredString[3]);
+        if(enteredString.length() >= 3) fourthCharacterOfTheCommand = (1, enteredString[3]);
 
         /*cout << twoСommandСharacters << endl;
         cout << thirdCharacterOfTheCommand << endl;*/
         if (enteredString == "help" || enteredString == "sos") {
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 14));
             cout << "=============================================== HELP =================================================" << endl;
-            cout << ">> сd - change directory         || Example: 'cdexample'  -  move to 'example' directory from the original" << endl; //
-            cout << ">                                || Example: 'cd" << ((char)92) << "'  -  go to the root directory, to the drive" << endl; //
-            cout << ">                                || Example: 'cd.'  -  go one directory back" << endl; //
-            cout << ">                                || Example: 'cd!C'  -  change drive to 'C:'" << endl; //
+            cout << ">> сd - change directory         || Example: 'cd example'  -  move to 'example' directory from the original" << endl; //
+            cout << ">                                || Example: 'cd " << ((char)92) << "'  -  go to the root directory, to the drive" << endl; // 
+            cout << ">                                || Example: 'cd ..'  -  go one directory back" << endl; // 
+            cout << ">                                || Example: 'cd C:'  -  change drive to 'C:'" << endl; //
             cout << ">                                || Example: 'cd'  -  show where you are" << endl; //
-            cout << ">                                || Example: 'cd*C:" << ((char)92) << "Users'  -  specify the path manually" << endl; //
-            cout << ">> sf - search files in directory|| Example: 'sf.txt'  -  search only .txt files and get info about them" << endl; //
-            cout << ">                                || Example: 'sf.'  -  search all files and get info about them" << endl; //
+            cout << ">                                || Example: 'cd C:" << ((char)92) << "Users'  -  specify the path manually" << endl; // 
+            cout << ">> ls - search files in directory|| Example: 'ls .txt'  -  search only .txt files and get info about them" << endl; //
+            cout << ">                                || Example: 'ls'  -  search all files and get info about them" << endl; //
             cout << ">> ef - encrypt file(s)          || Example: 'etest.txt'  -  encrypt the file using password" << endl;
             cout << ">                                || Example: 'ef.txt'  -  encrypt all files of extension .txt" << endl;
             cout << ">                                || Example: 'ef.'  -  encrypt all files in directory" << endl;
@@ -735,8 +742,7 @@ void menu() {
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
         }
         else if (twoСommandСharacters == "cd") {
-            //cout << "here" << (int)thirdCharacterOfTheCommand << "!" << endl;
-            if (fourthCharacterOfTheCommand == ((char)92)) {
+            if (enteredString.length() > 3 && enteredString[3] == ((char)92)) {
                 SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
                 cout << "Last directory: " << directory << endl;
                 string newDirectory = "";
@@ -747,7 +753,7 @@ void menu() {
                 directory = newDirectory;
                 SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
             }
-            else if (thirdCharacterOfTheCommand == '.') {
+            else if (enteredString.length() > 3 && enteredString[3] == '.' && enteredString[4] == '.') {
                 SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
                 int markerOfSeparator = 0;
                 for (int i = directory.length(); i > 2; i--) {
@@ -769,12 +775,12 @@ void menu() {
                 }
                 SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
             }
-            else if (thirdCharacterOfTheCommand == ((char)0)) {
+            else if (enteredString.length() > 1 && enteredString[2] == ((char)0)) {
                 SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
                 cout << "Directory: " << directory << endl;
                 SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
             }
-            else if (thirdCharacterOfTheCommand == '!') {
+            else if (enteredString.length() > 3 && enteredString[4] == ':' && enteredString.length() < 6) {
                 SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
                 char newDrive;
                 newDrive = (char)enteredString[3];
@@ -794,31 +800,39 @@ void menu() {
                 cout << "New directory: " << directory << endl;
                 SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
             }
-            else if (thirdCharacterOfTheCommand == '*') {
+            else if (enteredString.length() > 3 && enteredString[4] == ':' && enteredString[5] == char(92)) { 
                 string newDirectory = "";
                 for (int i = 3; i < enteredString.length(); i++) {
                     newDirectory = newDirectory + enteredString[i];
                 }
                 directory = newDirectory;
             }
-            else {
+            else if (enteredString.length() > 1 && enteredString[2] == ' ' && enteredString[4] != ':') {
                 string newFolder = "";
-                for (int i = 2; i < enteredString.length(); i++) {
+                for (int i = 3; i < enteredString.length(); i++) {
                     newFolder = newFolder + enteredString[i];
                 }
                 directory = directory + ((char)92) + newFolder;
             }
+            else {
+                uknowCommand();
+            }
         }
         ////////////////////////////////////////////////////////////////////////
-        if (twoСommandСharacters == "sf") {
-            if (thirdCharacterOfTheCommand == '.') {
+        if (enteredString[0] == 'l' && enteredString[1] == 's') {
+            if (enteredString.length() < 3) {
+                enteredString = enteredString + " .";
+            }
+            if (enteredString[3] == '.') {
                 string fileExtension = "";
-                for (int i = 2; i < enteredString.length(); i++) {
+                for (int i = 3; i < enteredString.length(); i++) {
                     fileExtension = fileExtension + enteredString[i];
                 }
                 fileCheked(fileExtension);
             }
+            else { uknowCommand(); }
         }
+        else { uknowCommand(); }
         ///////////////////////////////////////////////////////////////////////
         if (twoСommandСharacters == "gi") {
             string fileName = "";
