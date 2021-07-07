@@ -48,8 +48,21 @@ int maxMemoryUsage = 0;
 TCHAR buffer[MAX_PATH];
 string password = "";
 
-boolean createJunkFiles() {
-    system("fsutil file createnew E:\File.txt 600");
+boolean createJunkFiles(int fullVolume) {
+    const string fsuntilSourceString = "fsutil file createnew ";
+    const string fileName = "junk";
+    const int quantityOfFile = 16;
+    string watchedDirectory = "";
+    int volumeOfFile = fullVolume / quantityOfFile + 1;
+    for (int i = 0; i < quantityOfFile; i++) {
+        string fullComand = fsuntilSourceString + directory + char(92) + fileName + to_string(i) + ".txt " + to_string(volumeOfFile);
+        char* writable = new char[fullComand.size() + 1];
+        copy(fullComand.begin(), fullComand.end(), writable);
+        writable[fullComand.size()] = '\0';
+        cout << writable << "this" << endl;
+        cout << "Volume! " << to_string(volumeOfFile) << endl;
+        system(writable);
+    }
     return 0;
 }
 
@@ -684,14 +697,15 @@ void menu() {
                 cout << "\n";
             }
         }
-        if (enteredString[0] == 'o' && enteredString[1] == 'f') {
-            string fileName = "";
+        if (enteredString[0] == 'o' && enteredString[1] == 'f') { //not worked
+            string fileName = "cd " + directory + " & ";
             for (int i = 3; i < enteredString.length(); i++) {
                 fileName = fileName + enteredString[i];
             }
             char* fileToOpen = new char[fileName.size() + 1];
             copy(fileName.begin(), fileName.end(), fileToOpen);
             fileToOpen[fileName.size()] = '\0'; // don't forget the terminating 0
+            cout << fileToOpen << "=open \n";
             system(fileToOpen);
         }
         if (enteredString[0] == 'r' && enteredString[1] == 'p') {
@@ -763,7 +777,7 @@ void menu() {
         }
         if (enteredString[0] == 'r' && enteredString[1] == 't') {
             string watchedDirectory = "";
-            createJunkFiles();
+            createJunkFiles(8547962);
         }
     }
 }
