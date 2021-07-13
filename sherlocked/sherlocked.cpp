@@ -48,32 +48,80 @@ int maxMemoryUsage = 0;
 TCHAR buffer[MAX_PATH];
 string password = "";
 
-boolean createJunkFiles(int fullVolume) {
+long long freeSpaceCountner(string watchedDirectory, bool visible) {
+    ULARGE_INTEGER liFreeBytesAvailable;
+    ULARGE_INTEGER liTotalNumberOfBytes;
+    ULARGE_INTEGER liTotalNumberOfFreeBytes;
+    wstring wWatchedDirectory(watchedDirectory.begin(), watchedDirectory.end());
+    const wchar_t* wCharWatchedDirectory = wWatchedDirectory.c_str();
+    ::GetDiskFreeSpaceEx((wCharWatchedDirectory),
+        &liFreeBytesAvailable,      // bytes available to caller
+        &liTotalNumberOfBytes,      // bytes on disk
+        &liTotalNumberOfFreeBytes); // free bytes on disk
+
+    const LONGLONG nKBFactor = 1024;
+    const LONGLONG nMBFactor = nKBFactor * 1024;
+    const LONGLONG nGBFactor = nMBFactor * 1024;
+
+    long int dKBFreSpace = (double)(LONGLONG)liTotalNumberOfFreeBytes.QuadPart / nKBFactor; // get free space in KB.
+    double dMBFreSpace = (double)(LONGLONG)liTotalNumberOfFreeBytes.QuadPart / nMBFactor; // get free space in MB.
+    double dGBFreSpace = (double)(LONGLONG)liTotalNumberOfFreeBytes.QuadPart / nGBFactor; // get free space in GB.
+    if(visible == true){
+    SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
+    cout << "Free disk space '" << watchedDirectory[0] << ":'" << endl;
+    cout << dKBFreSpace << " KB of free space \n" << dMBFreSpace << " MB of free space \n" << dGBFreSpace << " GB of free space \n";
+    SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+    }
+    return dKBFreSpace;
+}
+
+void deleteFile(string fileName, bool visible) {
+    char* fileLocationToDelete = new char[fileName.size() + 1];
+    copy(fileName.begin(), fileName.end(), fileLocationToDelete);
+    fileLocationToDelete[fileName.size()] = '\0';
+    if (!remove(fileLocationToDelete) && visible == true) {
+        SetConsoleTextAttribute(hConsole, (WORD)((2 << 4) | 15));
+        cout << "The selected file has been successfully deleted!";
+        SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+        cout << "\n";
+    }
+    else {
+        if (visible == true) {
+            SetConsoleTextAttribute(hConsole, (WORD)((4 << 4) | 15));
+            cout << "Failed to delete the selected file!";
+            SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+            cout << "\n";
+        }
+    }
+}
+
+boolean createJunkFiles(string watchedDirectory, long long fullVolume) {
+    bool complete = false;
     const string fsuntilSourceString = "fsutil file createnew ";
     const string fileName = "junk";
     const int quantityOfFile = 16;
-    string watchedDirectory = "";
-    int volumeOfFile = fullVolume / quantityOfFile + 1;
+    long long volumeOfFile = (fullVolume / quantityOfFile)*0.9995;
+    SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
+    cout << "Create:[";
     for (int i = 0; i < quantityOfFile; i++) {
-        string fullComand = fsuntilSourceString + directory + char(92) + fileName + to_string(i) + ".txt " + to_string(volumeOfFile);
+        string fullComand = "";
+            fullComand = "cd /d" + watchedDirectory + " & " + fsuntilSourceString + fileName + to_string(i) + ".junk " + to_string(volumeOfFile) + " > nul";
         char* writable = new char[fullComand.size() + 1];
         copy(fullComand.begin(), fullComand.end(), writable);
         writable[fullComand.size()] = '\0';
-        cout << writable << "this" << endl;
-        cout << "Volume! " << to_string(volumeOfFile) << endl;
+        //cout << "Writible:" << writable << "\nfullComand:" << fullComand << "\nwatchedDirectory:" << watchedDirectory << "\n";
         system(writable);
+        cout << "#";
     }
-    return 0;
+    cout << "] 100% \n";
+    SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+    return complete;
 }
 
 string UNIXtoDate(long int seconds) {
-
-    // Save the time in Human
-    // readable format
+    // Save the time in Human readable format
     string ans = "";
-
-    // Number of days in month
-    // in normal year
+    // Number of days in month in normal year
     int daysOfMonth[] = { 31, 28, 31, 30, 31, 30,
                           31, 31, 30, 31, 30, 31 };
 
@@ -99,9 +147,7 @@ string UNIXtoDate(long int seconds) {
         currYear += 1;
     }
 
-    // Updating extradays because it
-    // will give days till previous day
-    // and we have include current day
+    // Updating extradays because it will give days till previous day and we have include current day
     extraDays = daysTillNow + 1;
 
     if (currYear % 400 == 0
@@ -363,7 +409,7 @@ boolean fileCheked(string fileExtension) {
                     }
                 }
                 if ((fileExtension == fileExtensionBeingViewed) || (fileExtension == ".")) {
-                    if (countnerOfFiles > 2) {
+                    if (countnerOfFiles > 0) {
                         if (isTheFileEncrypted(str) == 1) {
                             SetConsoleTextAttribute(hConsole, (WORD)((10 << 4) | 0));
                             cout << "[+]";
@@ -526,11 +572,11 @@ void menu() {
             SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 14));
             cout << "=============================================== HELP =================================================" << endl;
             cout << ">> сd - change directory         || Example: 'cd example'  -  move to 'example' directory from the original" << endl; //
-            cout << ">                                || Example: 'cd " << ((char)92) << "'  -  go to the root directory, to the drive" << endl; // 
-            cout << ">                                || Example: 'cd ..'  -  go one directory back" << endl; // 
+            cout << ">                                || Example: 'cd " << ((char)92) << "'  -  go to the root directory, to the drive" << endl; //
+            cout << ">                                || Example: 'cd ..'  -  go one directory back" << endl; //
             cout << ">                                || Example: 'cd C:'  -  change drive to 'C:'" << endl; //
             cout << ">                                || Example: 'cd'  -  show where you are" << endl; //
-            cout << ">                                || Example: 'cd C:" << ((char)92) << "Users'  -  specify the path manually" << endl; // 
+            cout << ">                                || Example: 'cd C:" << ((char)92) << "Users'  -  specify the path manually" << endl; //
             cout << ">> ls - search files in directory|| Example: 'ls .txt'  -  search only .txt files and get info about them" << endl; //
             cout << ">                                || Example: 'ls'  -  search all files and get info about them" << endl; //
             cout << ">> ef - encrypt file(s)          || Example: 'ef test.txt'  -  encrypt the file using password" << endl;
@@ -681,31 +727,16 @@ void menu() {
                 fileName = fileName + enteredString[i];
             }
             fileName = directory + char(92) + fileName;
-            char* fileLocationToDelete = new char[fileName.size() + 1];
-            copy(fileName.begin(), fileName.end(), fileLocationToDelete);
-            fileLocationToDelete[fileName.size()] = '\0'; // don't forget the terminating 0
-            if (!remove(fileLocationToDelete)) {
-                SetConsoleTextAttribute(hConsole, (WORD)((2 << 4) | 15));
-                cout << "The selected file has been successfully deleted!";
-                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
-                cout << "\n";
-            }
-            else {
-                SetConsoleTextAttribute(hConsole, (WORD)((4 << 4) | 15));
-                cout << "Failed to delete the selected file!";
-                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
-                cout << "\n";
-            }
+            deleteFile(fileName, true);
         }
-        if (enteredString[0] == 'o' && enteredString[1] == 'f') { //not worked
+        if (enteredString[0] == 'o' && enteredString[1] == 'f') {
             string fileName = "cd " + directory + " & ";
             for (int i = 3; i < enteredString.length(); i++) {
                 fileName = fileName + enteredString[i];
             }
             char* fileToOpen = new char[fileName.size() + 1];
             copy(fileName.begin(), fileName.end(), fileToOpen);
-            fileToOpen[fileName.size()] = '\0'; // don't forget the terminating 0
-            cout << fileToOpen << "=open \n";
+            fileToOpen[fileName.size()] = '\0';
             system(fileToOpen);
         }
         if (enteredString[0] == 'r' && enteredString[1] == 'p') {
@@ -742,42 +773,37 @@ void menu() {
             }
         }
         if (enteredString[0] == 'f' && enteredString[1] == 's') {
-            ULARGE_INTEGER liFreeBytesAvailable;
-            ULARGE_INTEGER liTotalNumberOfBytes;
-            ULARGE_INTEGER liTotalNumberOfFreeBytes;
             string watchedDirectory = "";
             for (int i = 0; i < 3; i++) {
                 watchedDirectory = watchedDirectory + directory[i];
             }
             watchedDirectory = watchedDirectory + (char(92));
-            wstring wWatchedDirectory(watchedDirectory.begin(), watchedDirectory.end());
-            const wchar_t* wCharWatchedDirectory = wWatchedDirectory.c_str();
-            ::GetDiskFreeSpaceEx((wCharWatchedDirectory),              
-                &liFreeBytesAvailable,      // bytes available to caller
-                &liTotalNumberOfBytes,      // bytes on disk
-                &liTotalNumberOfFreeBytes); // free bytes on disk
-
-            const LONGLONG nKBFactor = 1024;            
-            const LONGLONG nMBFactor = nKBFactor * 1024;
-            const LONGLONG nGBFactor = nMBFactor * 1024; 
-
-            // get free space in KB.
-            long int dKBFreSpace
-                = (double)(LONGLONG)liTotalNumberOfFreeBytes.QuadPart / nKBFactor;
-            // get free space in MB.
-            double dMBFreSpace
-                = (double)(LONGLONG)liTotalNumberOfFreeBytes.QuadPart / nMBFactor;
-            // get free space in GB.
-            double dGBFreSpace
-                = (double)(LONGLONG)liTotalNumberOfFreeBytes.QuadPart / nGBFactor;
-            SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
-            cout << "Free disk space '" << watchedDirectory[0] << ":'" << endl;
-            cout << dKBFreSpace << " KB of free space \n" << dMBFreSpace << " MB of free space \n" << dGBFreSpace << " GB of free space \n";
-            SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+            //cout << watchedDirectory << "\n";
+            freeSpaceCountner(watchedDirectory, true);
         }
         if (enteredString[0] == 'r' && enteredString[1] == 't') {
             string watchedDirectory = "";
-            createJunkFiles(8547962);
+            for (int i = 0; i < 3; i++) {
+                watchedDirectory = watchedDirectory + directory[i];
+            }
+            watchedDirectory = watchedDirectory + (char(92));
+            long long fullVolume = freeSpaceCountner(watchedDirectory, false) * 1024;
+            createJunkFiles(directory, fullVolume);
+            string junkFileName = "junk";
+            if (enteredString.length() < 3){
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 2));
+                cout << "Delete:[";
+                string numToStr = "";
+                string deleteFileWay = "";
+                for (int i = 0; i < 16; i++) {
+                    numToStr = "" + to_string(i);
+                    deleteFileWay = directory + char(92) + junkFileName + numToStr + "." + junkFileName;
+                    deleteFile(deleteFileWay, false);
+                    cout << "#";
+                 }
+                cout << "] 100% \n";
+                SetConsoleTextAttribute(hConsole, (WORD)((0 << 4) | 15));
+            }
         }
     }
 }
